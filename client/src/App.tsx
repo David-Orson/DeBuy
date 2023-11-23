@@ -1,143 +1,111 @@
+// npm
 import React, { useEffect, useState } from "react";
+import {
+    createBrowserRouter,
+    RouterProvider,
+    useNavigate,
+} from "react-router-dom";
 import { ethers } from "ethers";
 
-import TokenABI from "./abi/toyTokenAbi.json";
+// abi
+import deBucks from "./abi/deBucks.json";
+import deBucksSale from "./abi/deBucksSale.json";
+import deBuyAbi from "./abi/deBuy.json";
 
-const tokenAddress = "0x5fbdb2315678afecb367f032d93f642f64180aa3";
+// views
+import Landing from "./views/Landing";
+import Browse from "./views/Browse";
 
-function App() {
-    const [provider, setProvider] = useState<any>(undefined);
-    const [userAddress, setUserAddress] = useState<string | undefined>(
-        undefined
-    );
-    const [tokenBalance, setTokenBalance] = useState<BigInt>(BigInt(0));
-    const [transferTo, setTransferTo] = useState<string>("");
-    const [transferAmount, setTransferAmount] = useState<string>("");
+// types
+import { Abis, W3 } from "./abi/types";
 
+// hooks
+import { useHooks } from "./hooks";
+
+const abis: Abis = {
+    deBucks,
+    deBucksSale,
+    deBuy: deBuyAbi,
+};
+
+const deBx = "0x5fbdb2315678afecb367f032d93f642f64180aa3";
+const deBxSale = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
+const deBuy = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
+
+const App = () => {
+    // hooks
+    const hooks = useHooks();
+
+    // state
+    const [w3, setW3] = useState<W3>({} as W3);
+
+    // router
+    const router = createBrowserRouter([
+        {
+            path: "/",
+            element: <Landing w3={w3} setW3={setW3} />,
+        },
+        {
+            path: "/browse",
+            element: <Browse w3={w3} setW3={setW3} />,
+        },
+    ]);
+
+    // lifecycle
     useEffect(() => {
         if (window.ethereum) {
-            setProvider(new ethers.BrowserProvider(window.ethereum));
+            if (localStorage.getItem("userAddr")) {
+                // the deBxBalance hook sets w3 with the address and balance along with the dummy w3 passed in here.
+                hooks.deBxBalance(
+                    {
+                        deBx,
+                        deBxSale,
+                        deBuy,
+                        abis,
+                        provider: new ethers.BrowserProvider(window.ethereum),
+                        userAddr: localStorage.getItem("userAddr") || "",
+                        balance: BigInt(0),
+                    },
+                    setW3,
+                    localStorage.getItem("userAddr") as string
+                );
+            } else {
+                // otherwise we have no user in storage so set up the w3 with the base properties.
+                setW3({
+                    deBx,
+                    deBxSale,
+                    deBuy,
+                    abis,
+                    provider: new ethers.BrowserProvider(window.ethereum),
+                    userAddr: "",
+                    balance: BigInt(0),
+                });
+            }
         }
     }, []);
 
-    const connectWallet = async () => {
-        if (window.ethereum) {
-            try {
-                const accounts = (await window.ethereum.request({
-                    method: "eth_requestAccounts",
-                })) as string[];
-                // Set the first account as the user's address
-                setUserAddress(
-                    accounts && accounts.length > 0 ? accounts[0] : ""
-                );
-            } catch (error) {
-                console.error("User denied account access");
-            }
-        }
+    // methods
+    const logout = () => {
+        localStorage.removeItem("userAddr");
+        window.location.href = "/";
+        setW3({
+            ...w3,
+            userAddr: "",
+            balance: BigInt(0),
+        });
     };
-
-    const fetchTokenBalance = async () => {
-        console.log("Fetching token balance");
-        if (!provider || !userAddress) return;
-
-        console.log("prefire");
-
-        const tokenContract = new ethers.Contract(
-            tokenAddress,
-            TokenABI,
-            provider
-        );
-        console.log("postfire", userAddress);
-        const balance = await tokenContract.balanceOf(userAddress);
-        console.log("Balance: ", balance, balance.toString());
-        setTokenBalance(balance);
-    };
-
-    // Function to handle the transfer of tokens
-    const transferTokens = async () => {
-        if (!provider || !userAddress) {
-            console.error("Provider or user address not found");
-            return;
-        }
-
-        try {
-            console.log("Transfering tokens");
-            // Create a signer from the provider and user's address
-            const signer = await provider.getSigner(userAddress);
-
-            console.log("Signer: ", signer);
-
-            const abi = ["function transfer(address to, uint amount)"];
-
-            // Create a new instance of the contract connected to the signer,
-            // which allows you to perform write operations
-            const tokenContract = new ethers.Contract(
-                tokenAddress,
-                abi,
-                signer
-            );
-
-            console.log("Token Contract: ", tokenContract);
-
-            // Convert the amount to the correct unit based on the token's decimals
-            // This is not required for TTK, but maybe for ETH or other tokens
-            // const amountInWei = ethers.parseUnits(transferAmount, "ether"); // Replace 'ether' with the token's actual decimals if different
-
-            // console.log("Amount in Wei: ", amountInWei);
-
-            // Execute the transfer
-
-            const tx = await tokenContract.transfer(transferTo, transferAmount);
-
-            // this is an eth transfer
-            /*const tx = await signer.sendTransaction({
-                to: transferTo,
-                value: ethers.parseEther("1.0"),
-            });*/
-
-            console.log("Tx: ", tx);
-
-            // Wait for the transaction to be mined
-            await tx.wait();
-
-            console.log(`Transfer successful! Hash: ${tx.hash}`);
-        } catch (error) {
-            console.error("Transfer failed:", error);
-        }
-    };
-
-    // More functionalities like connect wallet, transfer tokens, etc.
 
     return (
         <div className="App">
-            <button onClick={connectWallet}>connect</button>
-            <div>{userAddress}</div>
-            <button onClick={fetchTokenBalance}>fetch balance</button>
-            <div>{tokenBalance.toString()} TTK</div>
-            <div>
-                {/* Input for the recipient's address */}
-                <input
-                    type="text"
-                    value={transferTo}
-                    onChange={(e) => setTransferTo(e.target.value)}
-                    placeholder="Recipient Address"
-                />
-
-                {/* Input for the amount to transfer */}
-                <input
-                    type="text"
-                    value={transferAmount}
-                    onChange={(e) => setTransferAmount(e.target.value)}
-                    placeholder="Amount to Transfer"
-                />
-
-                {/* Button to initiate the transfer */}
-                <button onClick={transferTokens}>Transfer Tokens</button>
-
-                {/* ... rest of your component ... */}
-            </div>
+            {w3.userAddr && (
+                <div>
+                    <div>{w3.userAddr}</div>
+                    <button onClick={logout}>logout</button>
+                </div>
+            )}
+            <RouterProvider router={router} />
         </div>
     );
-}
+};
 
 export default App;

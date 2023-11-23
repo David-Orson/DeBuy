@@ -1,20 +1,24 @@
-import { ethers } from "hardhat";
-import { ToyToken } from "../typechain-types";
+const { ethers } = require("hardhat");
 
 async function main() {
-    const ToyToken = await ethers.getContractFactory("ToyToken");
-    const toyToken: ToyToken = await ToyToken.deploy(1000);
+    // Deploy DeBucks
+    const DeBucks = await ethers.getContractFactory("DeBucks");
+    const [owner] = await ethers.getSigners();
+    const deBucks = await DeBucks.deploy(owner.getAddress(), 1000);
+    console.log(`DeBucks deployed to: ${await deBucks.getAddress()}`);
 
-    toyToken.getAddress();
+    // Deploy DeBucksSale
+    const DeBucksSale = await ethers.getContractFactory("DeBucksSale");
+    const deBucksSale = await DeBucksSale.deploy(await deBucks.getAddress());
+    console.log(`DeBucksSale deployed to: ${await deBucksSale.getAddress()}`);
 
-    await toyToken.waitForDeployment();
-
-    console.log(`ToyToken deployed to: ${toyToken.getAddress()}`);
+    // Deploy DeBuy
+    const DeBuy = await ethers.getContractFactory("DeBuy");
+    const deBuy = await DeBuy.deploy(await deBucks.getAddress());
+    console.log(`DeBuy deployed to: ${await deBuy.getAddress()}`);
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
 main().catch((error) => {
     console.error(error);
-    process.exitCode = 1;
+    process.exit(1);
 });
