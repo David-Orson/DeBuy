@@ -1,13 +1,15 @@
+// npm
 import React, { useState } from "react";
+
+// hooks
 import { useContracts, useIpfs } from "../hooks";
 
 type ListItemProps = {
     w3: any;
     setW3: (w3: any) => void;
-    refreshItems: () => void;
 };
 
-const ListItem = ({ w3, setW3, refreshItems }: ListItemProps) => {
+const ListItem = ({ w3, setW3 }: ListItemProps) => {
     // hooks
     const contracts = useContracts();
     const ipfs = useIpfs();
@@ -19,6 +21,7 @@ const ListItem = ({ w3, setW3, refreshItems }: ListItemProps) => {
     const [file, setFile] = useState<any>(null);
     const [image, setImage] = useState<any>(null);
 
+    // methods
     const handleSubmit = async (e: any) => {
         e.preventDefault();
 
@@ -47,8 +50,6 @@ const ListItem = ({ w3, setW3, refreshItems }: ListItemProps) => {
         console.log(item);
 
         await contracts.listItem(w3, setW3, item);
-
-        refreshItems();
     };
 
     return (

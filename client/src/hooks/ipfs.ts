@@ -1,9 +1,10 @@
+// npm
 import axios from "axios";
 
+// secrets
 //const JWT = process.env.PINATA_KEY;
-const JWT = "<your pinata key here>";
-
-const gateway = "<your gateway here>";
+const JWT = "<YOUR PINATA KEY>";
+const gateway = "<YOUR GATEWAY>";
 
 export const useIpfs = () => {
     const uploadFile = async (
@@ -35,8 +36,6 @@ export const useIpfs = () => {
                 formData,
                 { maxBodyLength: 10000000000, headers }
             );
-
-            console.log("data", res.data.IpfsHash);
 
             return res.data.IpfsHash;
         } catch (error) {

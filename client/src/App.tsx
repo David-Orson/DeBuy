@@ -14,17 +14,17 @@ import Browse from "./views/Browse";
 import Profile from "./views/Profile";
 
 // types
-import { Abis, W3 } from "./abi/types";
+import { Abis, Item, Review, W3 } from "./types";
 
 // hooks
 import { useContracts } from "./hooks";
 
+// blockchain data
 const abis: Abis = {
     deBucks,
     deBucksSale,
     deBuy: deBuyAbi,
 };
-
 const deBx = "0x5fbdb2315678afecb367f032d93f642f64180aa3";
 const deBxSale = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
 const deBuy = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
@@ -35,16 +35,18 @@ const App = () => {
 
     // state
     const [w3, setW3] = useState<W3>({} as W3);
+    const [items, setItems] = useState<Item[]>([]);
+    const [reviews, setReviews] = useState<Review[]>([]);
 
     // router
     const router = createBrowserRouter([
         {
             path: "/",
-            element: <Landing w3={w3} setW3={setW3} />,
+            element: <Landing w3={w3} setW3={setW3} setItems={setItems} />,
         },
         {
             path: "/browse",
-            element: <Browse w3={w3} setW3={setW3} />,
+            element: <Browse w3={w3} setW3={setW3} items={items} />,
         },
         {
             path: "/profile",
@@ -54,33 +56,31 @@ const App = () => {
 
     // lifecycle
     useEffect(() => {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const initailW3 = {
+            deBx,
+            deBxSale,
+            deBuy,
+            abis,
+            provider: provider,
+            userAddr: "",
+            balance: BigInt(0),
+        };
+
         if (window.ethereum) {
             if (localStorage.getItem("userAddr")) {
                 // the deBxBalance hook sets w3 with the address and balance along with the dummy w3 passed in here.
                 contracts.deBxBalance(
                     {
-                        deBx,
-                        deBxSale,
-                        deBuy,
-                        abis,
-                        provider: new ethers.BrowserProvider(window.ethereum),
+                        ...initailW3,
                         userAddr: localStorage.getItem("userAddr") || "",
-                        balance: BigInt(0),
                     },
                     setW3,
                     localStorage.getItem("userAddr") as string
                 );
             } else {
                 // otherwise we have no user in storage so set up the w3 with the base properties.
-                setW3({
-                    deBx,
-                    deBxSale,
-                    deBuy,
-                    abis,
-                    provider: new ethers.BrowserProvider(window.ethereum),
-                    userAddr: "",
-                    balance: BigInt(0),
-                });
+                setW3(initailW3);
             }
         }
     }, []);
@@ -96,71 +96,25 @@ const App = () => {
         });
     };
 
-    const buyDeBx = async () => {
-        const signer = await w3.provider.getSigner();
-
-        const transaction = {
-            to: w3.deBxSale, // Replace with your contract address
-            value: ethers.parseEther("1"), // Convert ETH amount to Wei
-        };
-
-        try {
-            const txResponse = await signer.sendTransaction(transaction);
-            await txResponse.wait();
-            console.log("Transaction successful! Hash:", txResponse.hash);
-        } catch (error) {
-            console.error("Transaction failed:", error);
-        }
-
-        contracts.deBxBalance(w3, setW3, w3.userAddr);
-    };
-
-    const getDeBxSaleBalance = async () => {
-        const deBxContract = new ethers.Contract(
-            w3.deBx, // Replace with your DeBucks contract address
-            w3.abis.deBucks, // ABI of DeBucks contract
-            w3.provider
-        );
-
-        try {
-            const balance = await deBxContract.balanceOf(w3.deBxSale); // Replace with your DeBucksSale contract address
-            console.log("DeBxSale Contract DeBx Balance:", balance.toString());
-        } catch (error) {
-            console.error("Error fetching balance:", error);
-        }
-    };
-
-    const fundDeBucksSaleContract = async () => {
-        // Create a provider and signer
-        const signer = await w3.provider.getSigner();
-
-        // Initialize the DeBucks contract
-        const deBucksContract = new ethers.Contract(
-            w3.deBx,
-            w3.abis.deBucks,
-            signer
-        );
-
-        // Approve the DeBucksSale contract to spend the specified amount of DeBx
-        const approveTx = await deBucksContract.approve(w3.deBxSale, 10000);
-        await approveTx.wait();
-
-        // Transfer DeBx from the owner to the DeBucksSale contract
-        const transferTx = await deBucksContract.transfer(w3.deBxSale, 10000);
-        await transferTx.wait();
-
-        console.log(`Transferred ${10000} DeBx to the sale contract`);
-    };
-
     return (
         <div className="App">
             {w3.userAddr && (
                 <div>
                     <div>{w3.userAddr}</div>
                     <button onClick={logout}>logout</button>
-                    <button onClick={buyDeBx}>buy DeBx</button>
-                    <button onClick={getDeBxSaleBalance}>sale balance</button>
-                    <button onClick={() => fundDeBucksSaleContract()}>
+                    <button onClick={() => contracts.buyDeBx(w3, setW3)}>
+                        buy DeBx
+                    </button>
+                    <button
+                        onClick={() => contracts.getDeBxSaleBalance(w3, setW3)}
+                    >
+                        sale balance
+                    </button>
+                    <button
+                        onClick={() =>
+                            contracts.fundDeBucksSaleContract(w3, setW3)
+                        }
+                    >
                         fund sale contract
                     </button>
                 </div>
