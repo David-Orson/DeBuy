@@ -4,7 +4,10 @@ async function main() {
     // Deploy DeBucks
     const DeBucks = await ethers.getContractFactory("DeBucks");
     const [owner] = await ethers.getSigners();
-    const deBucks = await DeBucks.deploy(owner.getAddress(), 1000);
+    const deBucks = await DeBucks.deploy(
+        owner.getAddress(),
+        ethers.parseEther("100000")
+    );
     console.log(`DeBucks deployed to: ${await deBucks.getAddress()}`);
 
     // Deploy DeBucksSale

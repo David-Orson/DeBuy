@@ -1,11 +1,10 @@
 // npm
-import React, { useState } from "react";
-import { ethers } from "ethers";
+import React from "react";
 
 // types
 import { W3 } from "../abi/types";
-import { Navigate, useNavigate } from "react-router";
-import { useHooks } from "../hooks";
+import { useNavigate } from "react-router";
+import { useContracts } from "../hooks";
 
 type LandingProps = {
     w3: W3;
@@ -14,10 +13,10 @@ type LandingProps = {
 
 const Landing = ({ w3, setW3 }: LandingProps) => {
     const navigate = useNavigate();
-    const hooks = useHooks();
+    const contracts = useContracts();
 
     const connect = async () => {
-        hooks.connectWallet(w3, setW3);
+        contracts.connectWallet(w3, setW3);
         navigate("/browse");
     };
 
