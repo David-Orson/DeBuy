@@ -8,6 +8,9 @@ import { W3 } from "../types";
 // hooks
 import { useContracts } from "../hooks";
 
+// components
+import { LandingPage } from "../components/pages";
+
 type LandingProps = {
     w3: W3;
     setW3: (w3: W3) => void;
@@ -29,11 +32,7 @@ const Landing = ({ w3, setW3, setItems }: LandingProps) => {
         navigate("/browse");
     };
 
-    return (
-        <div>
-            <button onClick={connect}>connect</button>
-        </div>
-    );
+    return <LandingPage connect={connect} />;
 };
 
 export default Landing;

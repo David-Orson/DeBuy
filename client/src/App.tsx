@@ -97,7 +97,14 @@ const App = () => {
     };
 
     return (
-        <div className="App">
+        <div
+            className="App"
+            style={{
+                backgroundColor: "hsl(273, 100%, 5%)",
+                width: "100vw",
+                height: "100vh",
+            }}
+        >
             {w3.userAddr && (
                 <div>
                     <div>{w3.userAddr}</div>
