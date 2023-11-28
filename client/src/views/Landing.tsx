@@ -29,7 +29,7 @@ const Landing = ({ w3, setW3, setItems }: LandingProps) => {
             setItems(items);
         });
 
-        navigate("/browse");
+        navigate("/shop/browse");
     };
 
     return <LandingPage connect={connect} />;

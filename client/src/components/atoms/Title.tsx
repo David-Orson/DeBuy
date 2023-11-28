@@ -29,7 +29,7 @@ export const Title = ({ children, h }: TitleProps) => {
             case 4:
                 return <StyledH4 size={w}>{children}</StyledH4>;
             default:
-                return <StyledH1 size={w}>{children}</StyledH1>; // or some default component
+                return <StyledH1 size={w}>{children}</StyledH1>;
         }
     };
 
@@ -45,6 +45,7 @@ const StyledH1 = styled.h1<StyledTitleProps>`
     color: ${theme.color.text};
     font: ${({ size }) => theme.font(size).h1(700)};
     text-align: center;
+    user-select: none;
 `;
 
 const StyledH2 = styled.h2<StyledTitleProps>`
@@ -52,6 +53,7 @@ const StyledH2 = styled.h2<StyledTitleProps>`
     color: ${theme.color.text};
     font: ${({ size }) => theme.font(size).h2(700)};
     text-align: center;
+    user-select: none;
 `;
 
 const StyledH3 = styled.h3<StyledTitleProps>`
@@ -59,6 +61,7 @@ const StyledH3 = styled.h3<StyledTitleProps>`
     color: ${theme.color.text};
     font: ${({ size }) => theme.font(size).h3(700)};
     text-align: center;
+    user-select: none;
 `;
 
 const StyledH4 = styled.h4<StyledTitleProps>`
@@ -66,6 +69,7 @@ const StyledH4 = styled.h4<StyledTitleProps>`
     color: ${theme.color.text};
     font: ${({ size }) => theme.font(size).h4(700)};
     text-align: center;
+    user-select: none;
 `;
 
 export default Title;

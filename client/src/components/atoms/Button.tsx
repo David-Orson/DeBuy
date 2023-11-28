@@ -9,8 +9,14 @@ type ButtonProps = {
     onClick: () => void;
     children: React.ReactNode;
     size?: "sm" | "md" | "lg";
+    glow?: boolean;
 };
-export const Button = ({ onClick, children, size = "md" }: ButtonProps) => {
+export const Button = ({
+    onClick,
+    children,
+    size = "md",
+    glow = false,
+}: ButtonProps) => {
     // state
     const [glowPosition, setGlowPosition] = useState(0);
     const [buttonWidth, setButtonWidth] = useState(0);
@@ -32,6 +38,7 @@ export const Button = ({ onClick, children, size = "md" }: ButtonProps) => {
             onMouseLeave={() => setGlowPosition(0)}
             glowPosition={glowPosition}
             innerWidth={buttonWidth}
+            glow={glow}
         >
             {children}
         </StyledButton>
@@ -40,6 +47,7 @@ export const Button = ({ onClick, children, size = "md" }: ButtonProps) => {
 
 type StyledButtonProps = {
     size?: "sm" | "md" | "lg";
+    glow: boolean;
     glowPosition: number;
     innerWidth: number;
 };
@@ -55,50 +63,55 @@ const StyledButton = styled.button<StyledButtonProps>`
     border: none;
     cursor: pointer;
     font: ${theme.font()["2xl"](700)};
-    box-sizing: border-box;
+    user-select: none;
 
-    &:hover {
-        background: ${theme.gradient.secondary(90)};
-        box-shadow: 0px 0px 50px #fff4;
-    }
+    ${({ glow, glowPosition, innerWidth }) =>
+        glow
+            ? css`
+                  &:hover {
+                      background: ${theme.gradient.secondary(90)};
+                      box-shadow: 0px 0px 50px #fff4;
+                  }
 
-    &::before,
-    &::after {
-        content: "";
-        position: absolute;
-        transition: ${theme.transition("box-shadow", 2, 1)};
-        box-shadow: 0px 0px 0px ${theme.color.primary(120)};
-    }
+                  &::before,
+                  &::after {
+                      content: "";
+                      position: absolute;
+                      transition: ${theme.transition("box-shadow", 2, 1)};
+                      box-shadow: 0px 0px 0px ${theme.color.primary(120)};
+                  }
 
-    &:hover::before,
-    &:hover::after {
-        height: 70%;
-        background: transparent;
-    }
+                  &:hover::before,
+                  &:hover::after {
+                      height: 70%;
+                      background: transparent;
+                  }
 
-    &:hover::before {
-        width: ${({ innerWidth }) => innerWidth * g}px;
-        clip-path: ellipse(75% 150% at 50% -100%);
+                  &:hover::before {
+                      width: ${innerWidth * g}px;
+                      clip-path: ellipse(75% 150% at 50% -100%);
 
-        // Glow on the top left
-        top: 0px;
-        left: ${({ glowPosition, innerWidth }) =>
-            glowPosition - innerWidth * g * (glowPosition / innerWidth)}%;
-        box-shadow: 2px -5px 25px ${theme.color.primary(140)};
-        border-radius: ${theme.radius.sm};
-    }
+                      // Glow on the top left
+                      top: 0px;
+                      left: ${glowPosition -
+                      innerWidth * g * (glowPosition / innerWidth)}%;
+                      box-shadow: 2px -5px 25px ${theme.color.primary(140)};
+                      border-radius: ${theme.radius.sm};
+                  }
 
-    &:hover::after {
-        width: ${({ innerWidth }) => innerWidth * g}px;
-        clip-path: ellipse(75% 150% at 50% 218%);
+                  &:hover::after {
+                      width: ${innerWidth * g}px;
+                      clip-path: ellipse(75% 150% at 50% 218%);
 
-        // Glow on the bottom right
-        bottom: 0px;
-        right: ${({ glowPosition, innerWidth }) =>
-            glowPosition - innerWidth * g * (glowPosition / innerWidth)}%;
-        box-shadow: -2px 5px 25px ${theme.color.primary(100)};
-        border-radius: ${theme.radius.sm};
-    }
+                      // Glow on the bottom right
+                      bottom: 0px;
+                      right: ${glowPosition -
+                      innerWidth * g * (glowPosition / innerWidth)}%;
+                      box-shadow: -2px 5px 25px ${theme.color.primary(100)};
+                      border-radius: ${theme.radius.sm};
+                  }
+              `
+            : null}
 
     ${(props) =>
         props.size === "sm"

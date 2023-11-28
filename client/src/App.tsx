@@ -19,6 +19,12 @@ import { Abis, Item, Review, W3 } from "./types";
 // hooks
 import { useContracts } from "./hooks";
 
+// components
+import { Navbar } from "./components/organisms";
+
+// theme
+import theme from "./theme";
+
 // blockchain data
 const abis: Abis = {
     deBucks,
@@ -37,22 +43,6 @@ const App = () => {
     const [w3, setW3] = useState<W3>({} as W3);
     const [items, setItems] = useState<Item[]>([]);
     const [reviews, setReviews] = useState<Review[]>([]);
-
-    // router
-    const router = createBrowserRouter([
-        {
-            path: "/",
-            element: <Landing w3={w3} setW3={setW3} setItems={setItems} />,
-        },
-        {
-            path: "/browse",
-            element: <Browse w3={w3} setW3={setW3} items={items} />,
-        },
-        {
-            path: "/profile",
-            element: <Profile />,
-        },
-    ]);
 
     // lifecycle
     useEffect(() => {
@@ -85,29 +75,40 @@ const App = () => {
         }
     }, []);
 
-    // methods
-    const logout = () => {
-        localStorage.removeItem("userAddr");
-        window.location.href = "/";
-        setW3({
-            ...w3,
-            userAddr: "",
-            balance: BigInt(0),
-        });
-    };
+    // router
+    const router = createBrowserRouter([
+        {
+            path: "/",
+            element: <Landing w3={w3} setW3={setW3} setItems={setItems} />,
+        },
+        {
+            path: "/shop",
+            element: <Navbar w3={w3} setW3={setW3} addr={w3.userAddr} />,
+            children: [
+                {
+                    path: "/shop/browse",
+                    element: <Browse w3={w3} setW3={setW3} items={items} />,
+                },
+                {
+                    path: "/shop/profile",
+                    element: <Profile />,
+                },
+            ],
+        },
+    ]);
 
     return (
         <div
             className="App"
             style={{
-                backgroundColor: "hsl(273, 100%, 5%)",
+                backgroundColor: theme.color.primary(10),
                 width: "100vw",
                 height: "100vh",
             }}
         >
-            {w3.userAddr && (
+            {/*w3.userAddr && (
                 <div>
-                    <div>{w3.userAddr}</div>
+                    {/* the navbar needs to have a button showing the user addr, a logout button, a profile button, and a button to buy DeBx. }
                     <button onClick={logout}>logout</button>
                     <button onClick={() => contracts.buyDeBx(w3, setW3)}>
                         buy DeBx
@@ -125,7 +126,7 @@ const App = () => {
                         fund sale contract
                     </button>
                 </div>
-            )}
+            )*/}
             <RouterProvider router={router} />
         </div>
     );

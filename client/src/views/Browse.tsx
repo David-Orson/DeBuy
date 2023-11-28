@@ -6,6 +6,7 @@ import { useNavigate } from "react-router";
 import { W3, Item, Review } from "../types";
 
 // components
+import { BrowsePage } from "../components/pages";
 import ListItem from "../components/listItem";
 
 // hooks
@@ -91,6 +92,10 @@ const Browse = ({ w3, setW3, items }: BrowseProps) => {
 
     return (
         <div>
+            <>
+                <BrowsePage />
+            </>
+            {/*
             <button onClick={() => navigate("/profile")}>Profile</button>
             <h1>Browse</h1>
             <div>{(w3.balance && w3.balance.toString()) || 0}</div>
@@ -190,6 +195,7 @@ const Browse = ({ w3, setW3, items }: BrowseProps) => {
                     ) : null;
                 })}
             </div>
+            */}
         </div>
     );
 };

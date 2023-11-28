@@ -2,8 +2,10 @@
 import React from "react";
 
 // components
-import { Button, Flex, FlexCol, Logo, Title } from "../atoms";
+import { Button, Flex, Logo, Title } from "../atoms";
 import Padding from "../atoms/Padding";
+
+// theme
 import theme from "../../theme";
 
 type LandingHeaderProps = {
@@ -16,10 +18,12 @@ export const LandingHeader = ({ connect }: LandingHeaderProps) => {
             <Flex justify="flex-start">
                 <Logo />
             </Flex>
-            <FlexCol minHeight={theme.spacing[512]}>
+            <Flex col minHeight={theme.spacing[512]} justify="space-evenly">
                 <Title>The Digital Asset Trading Future</Title>
-                <Button onClick={connect}>connect</Button>
-            </FlexCol>
+                <Button onClick={connect} glow>
+                    connect
+                </Button>
+            </Flex>
         </Padding>
     );
 };
