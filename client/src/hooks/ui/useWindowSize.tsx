@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+// npm
+import { useEffect, useState } from "react";
 
 export const useWindowSize = () => {
     // state

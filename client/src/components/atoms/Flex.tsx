@@ -1,5 +1,6 @@
 // npm
-import styled from "styled-components";
+import styled, { css } from "styled-components";
+import { Gap } from "../../theme/spacing";
 
 type Justify =
     | "center"
@@ -10,26 +11,72 @@ type Justify =
     | "space-evenly";
 type Align = "center" | "flex-start" | "flex-end" | "baseline" | "stretch";
 
-type Gap = 4 | 8 | 12 | 16 | 20 | 24 | 28 | 32 | 36 | 40 | 44 | 48 | 52 | 56;
-
 type FlexProps = {
+    children: React.ReactNode;
     col?: boolean;
-    wFull?: boolean;
-    minHeight?: string;
+    wfull?: boolean;
+    minheight?: string;
     justify?: Justify;
     align?: Align;
     bg?: string;
     gap?: Gap;
 };
 
-export const Flex = styled.div<FlexProps>`
+export const Flex = ({
+    children,
+    col,
+    wfull,
+    minheight,
+    justify,
+    align,
+    bg,
+    gap,
+}: FlexProps) => {
+    return (
+        <StyledFlex
+            $col={col ? 1 : 0}
+            $wfull={wfull ? 1 : 0}
+            $minheight={minheight}
+            $justify={justify}
+            align={align}
+            bg={bg}
+            $gap={gap}
+        >
+            {children}
+        </StyledFlex>
+    );
+};
+
+type StyledFlexProps = {
+    $col: number;
+    $wfull?: number;
+    $minheight?: string;
+    $justify?: Justify;
+    align?: Align;
+    bg?: string;
+    $gap?: Gap;
+};
+
+const StyledFlex = styled.div<StyledFlexProps>`
     position: relative;
     display: flex;
-    flex-direction: ${({ col }) => (col ? "column" : "row")};
-    justify-content: ${({ justify }) => justify || "center"};
+    flex-direction: ${({ $col }) => ($col ? "column" : "row")};
+    justify-content: ${({ $justify }) => $justify || "center"};
     align-items: ${({ align }) => align || "center"};
-    min-height: ${({ minHeight }) => minHeight || 0};
-    width: ${({ wFull }) => wFull && "100%"};
-    ${({ bg }) => bg && `background: ${bg}`};
-    ${({ gap }) => gap && `gap: ${gap}px`};
+    min-height: ${({ $minheight }) => $minheight || 0};
+    ${({ $wfull }) =>
+        $wfull &&
+        css`
+            width: 100%;
+        `};
+    ${({ bg }) =>
+        bg &&
+        css`
+            background: ${bg};
+        `};
+    ${({ $gap }) =>
+        $gap &&
+        css`
+            gap: ${$gap};
+        `};
 `;

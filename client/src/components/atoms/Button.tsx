@@ -18,16 +18,16 @@ export const Button = ({
     glow = false,
 }: ButtonProps) => {
     // state
-    const [glowPosition, setGlowPosition] = useState(0);
-    const [buttonWidth, setButtonWidth] = useState(0);
+    const [glowposition, setglowposition] = useState(0);
+    const [innerwidth, setinnerwidth] = useState(0);
 
     // methods
     const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
         const buttonRect = e.currentTarget.getBoundingClientRect();
-        setGlowPosition(
+        setglowposition(
             ((e.clientX - buttonRect.left) / buttonRect.width) * 100
         );
-        setButtonWidth(buttonRect.width);
+        setinnerwidth(buttonRect.width);
     };
 
     return (
@@ -35,10 +35,10 @@ export const Button = ({
             onClick={onClick}
             size={size}
             onMouseMove={handleMouseMove}
-            onMouseLeave={() => setGlowPosition(0)}
-            glowPosition={glowPosition}
-            innerWidth={buttonWidth}
-            glow={glow}
+            onMouseLeave={() => setglowposition(0)}
+            $glowposition={glowposition}
+            $innerwidth={innerwidth}
+            $glow={glow ? 1 : 0}
         >
             {children}
         </StyledButton>
@@ -47,9 +47,9 @@ export const Button = ({
 
 type StyledButtonProps = {
     size?: "sm" | "md" | "lg";
-    glow: boolean;
-    glowPosition: number;
-    innerWidth: number;
+    $glow: number;
+    $glowposition: number;
+    $innerwidth: number;
 };
 
 const g = 0.4;
@@ -65,11 +65,14 @@ const StyledButton = styled.button<StyledButtonProps>`
     font: ${theme.font()["2xl"](700)};
     user-select: none;
 
-    ${({ glow, glowPosition, innerWidth }) =>
-        glow
+    &:hover {
+        background: ${theme.gradient.secondary(90)};
+    }
+
+    ${({ $glow, $glowposition, $innerwidth }) =>
+        $glow
             ? css`
                   &:hover {
-                      background: ${theme.gradient.secondary(90)};
                       box-shadow: 0px 0px 50px #fff4;
                   }
 
@@ -88,25 +91,25 @@ const StyledButton = styled.button<StyledButtonProps>`
                   }
 
                   &:hover::before {
-                      width: ${innerWidth * g}px;
+                      width: ${$innerwidth * g}px;
                       clip-path: ellipse(75% 150% at 50% -100%);
 
                       // Glow on the top left
                       top: 0px;
-                      left: ${glowPosition -
-                      innerWidth * g * (glowPosition / innerWidth)}%;
+                      left: ${$glowposition -
+                      $innerwidth * g * ($glowposition / $innerwidth)}%;
                       box-shadow: 2px -5px 25px ${theme.color.primary(140)};
                       border-radius: ${theme.radius.sm};
                   }
 
                   &:hover::after {
-                      width: ${innerWidth * g}px;
+                      width: ${$innerwidth * g}px;
                       clip-path: ellipse(75% 150% at 50% 218%);
 
                       // Glow on the bottom right
                       bottom: 0px;
-                      right: ${glowPosition -
-                      innerWidth * g * (glowPosition / innerWidth)}%;
+                      right: ${$glowposition -
+                      $innerwidth * g * ($glowposition / $innerwidth)}%;
                       box-shadow: -2px 5px 25px ${theme.color.primary(100)};
                       border-radius: ${theme.radius.sm};
                   }

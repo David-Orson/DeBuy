@@ -19,8 +19,6 @@ type Brightness =
     | 190
     | 200;
 
-type Hover = 10 | 20;
-
 export const color = {
     primary: (b: Brightness) => `hsl(273, 100%, ${b / 2}%)`,
     secondary: (b: Brightness) => `hsl(25, 100%, ${b / 2}%)`,

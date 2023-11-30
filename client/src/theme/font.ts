@@ -1,4 +1,4 @@
-type Weight = 300 | 400 | 500 | 600 | 700;
+export type Weight = 300 | 400 | 500 | 600 | 700;
 
 const calculateMultiplier = (width: number) => {
     if (width > 1025) return 1;
@@ -7,7 +7,9 @@ const calculateMultiplier = (width: number) => {
     return 0.5;
 };
 
-export const font = (width = 1000) => {
+export const font = (
+    width = 1000
+): { [key: string]: (w: Weight) => string } => {
     const family = "'Work Sans', sans-serif";
     const m = calculateMultiplier(width);
 

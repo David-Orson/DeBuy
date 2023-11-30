@@ -1,11 +1,14 @@
 // npm
 import React from "react";
 
+// components
+import { PageTitle } from "../organisms";
+
 export const BrowsePage = () => {
     return (
-        <div>
-            <h1>Browse Page</h1>
-        </div>
+        <>
+            <PageTitle title="Browse" />
+        </>
     );
 };
 

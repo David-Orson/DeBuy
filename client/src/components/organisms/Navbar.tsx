@@ -51,9 +51,14 @@ export const Navbar = ({ w3, setW3, addr }: NavbarProps) => {
     return (
         <>
             <Padding>
-                <Flex wFull justify="space-between">
+                <Flex wfull justify="space-between">
                     <Logo />
-                    <Flex justify="flex-end" gap={width > 480 ? 32 : 16}>
+                    <Flex
+                        justify="flex-end"
+                        gap={
+                            width > 480 ? theme.spacing[32] : theme.spacing[16]
+                        }
+                    >
                         <StyledLink to={"/shop/browse"}>Shop</StyledLink>
                         <Dropdown label={formattedAddr}>
                             <Option onClick={() => navigate("./profile")}>

@@ -18,7 +18,7 @@ export const LandingHeader = ({ connect }: LandingHeaderProps) => {
             <Flex justify="flex-start">
                 <Logo />
             </Flex>
-            <Flex col minHeight={theme.spacing[512]} justify="space-evenly">
+            <Flex col minheight={theme.spacing[512]} justify="space-evenly">
                 <Title>The Digital Asset Trading Future</Title>
                 <Button onClick={connect} glow>
                     connect
